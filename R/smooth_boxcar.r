@@ -28,28 +28,37 @@
 #'
 #' @export
 #'
-smooth_boxcar <- function(x, w, type.wrap = NULL, average = T) {
+smooth_boxcar <- function(x, w, type.wrap = NULL, average = T, algorithm = 1) {
 
   if (!is.vector(x)) stop("Input 'x' must vector")
   if (is.null(w)) stop("Value for 'w' must be specified")
   if (w<=0) stop(" Value of 'w' must be strictly positive")
   if (round(w) != w) stop("Value of 'w' must be an integer number")
   if (w %% 2 == 0) stop("Value of 'w' must be an odd number")
+  if (!any(algorithm == 1:3)) stop("Value of 'algorithm must be 1, 2 or 3")
   nx <- length(x)
   w2 <- (w-1)/2
 
   # Convolution loop.
-  y <- numeric(nx)
-  y[w2+1] <- sum(x[1:w])
-  ilow <- 1
-  iup <- w + 1
-  for (i in (w2+2):(nx-w2)) {
-    y[i] <- y[i-1] - x[ilow] + x[iup]
-    ilow <- ilow + 1
-    iup <- iup + 1
-  }
+  if (algorithm == 1) {
+  } else if (algorithm == 2) {
+    y <- numeric(nx)
+    y[w2+1] <- sum(x[1:w])
+    ilow <- 1
+    iup <- w + 1
+    for (i in (w2+2):(nx-w2)) {
+      y[i] <- y[i-1] - x[ilow] + x[iup]
+      ilow <- ilow + 1
+      iup <- iup + 1
+    }
+    if (average) y <- y/w
+  } else {
 
-  if (average) y <- y/w
+    # REVISAR!!!!
+    y <- cumsum(x)
+    z <- c(y[w], y[-c(1:w)] - y[-c((nx-w+1):nx)])
+    z <- c(y[1:(w-1)], z)
+  }
 
   return(y)
 }
