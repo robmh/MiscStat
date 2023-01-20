@@ -20,24 +20,22 @@
 
 fast_kernsmooth <- function(x, y, type = "gaussian", width = NULL) {
 
+  if (!is.vector(x) | !is.vector(y)) stop("Inputs 'x' and 'y' must be vectors")
+
   if (is.null(width)) stop("Please supply width")
+  if (length(width) > 1) stop("Width must be a single number")
   if (width <= 0) stop("width must be >0")
 
   xmin <- min(x)
   xmax <- max(x)
   if (type == "gaussian") {
-    denom <- pnorm((xmax-y)/width) - pnorm((xmin-y)/width)
+    denom <- pnorm(outer(xmax, y, "-")/width) - pnorm(outer(xmin, y, "-")/width)
     w <- width^2
     w2 <- 2*w
-    z <- colSums(exp(-outer(y,x,"-")^2/w2)/denom)/(sqrt(2*pi)*width)
+    z <- colSums(sweep(exp(-outer(y,x,"-")^2/w2), 1, denom, FUN = "/")) / (sqrt(2*pi)*width)
   } else if (type == "lognormal") {
-    denom <- pnorm((xmax-y)/width) - pnorm((xmin-y)/width)
-    w <- width^2
-    w2 <- 2*w
-    z <- colSums(exp(-outer(y,x,"-")^2/w2)/denom)/(sqrt(2*pi)*width)
   } else {
-    z <- y
   }
-  return(z)
 
+  return(z)
 }
