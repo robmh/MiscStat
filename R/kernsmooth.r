@@ -41,7 +41,7 @@
 #' plot(x, znorm, type = "l")
 #' points(x, z, type = "l", lty = 2)
 #'
-#' # Points are more spread out.
+#' # Example with points more spread out.
 #' y <- y*50 + 20
 #' znorm <- kernsmooth(x, y, width = 2)
 #' plot(x, znorm, type = "l")
